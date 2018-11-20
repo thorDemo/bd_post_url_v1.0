@@ -9,13 +9,13 @@ import datetime
 import time
 import os
 import requests
-import json
+from random import sample
 # 参数定义
 # ————————————
 post_url_path = 'url/result.txt'                 # 推送哪些url
 post_num_every_index = 2000                     # 每次每个目录推送多少条数据，最大值是2000
 post_frequency = 10                             # 推送延迟每隔离多少分钟推送一次,单位分钟 m
-post_token = 'BqDTzfdAZLbjFkwp'                 # 推送的token
+post_token = 'mckuWUsS5ljr4Roh'                 # 推送的token
 # ————————————
 # ————————————
 logger = logging.getLogger(__name__)            # 日志配置
@@ -34,27 +34,24 @@ logger.addFilter(ch)
 
 
 # 生成额定数量需要推送的url
+def rand_char():
+    char = 'qwertyuiopasdfghjklzxcvbnm1234567890'
+    return ''.join(sample(char, 5))
+
 
 def create_post_url(num):
     urls = open(post_url_path, "r")
     for url in urls:
-        index = open('url/index2.txt', "r+")
+        index = open('url/index.txt', "r+")
         for line in index:
             post_url = open('url/cache/' + post_url_path[4:], 'w+')
             print('当前列表页为' + line)
             for x in range(0, num):
-                # 大写字母+小写字母+数字
-                list = [chr(i) for i in range(65, 91)] + [chr(i) for i in range(97, 123)] + [str(i) for i in range(10)]
-                char = random.sample(list, 10)
-                xxx = ''
-                value = xxx.join(char)
+                value = rand_char()
                 now_time = datetime.datetime.now().strftime('%Y%m%d')  # 现在
-                post_url.write('www.' + url.strip('\n') + '/' + line.strip('\n') + now_time + value + '.html\n')
+                post_url.write('http://www.' + url.strip('\n') + '/' + line.strip('\n') + now_time + value + '.html\n')
             post_url.close()
             post_all_url(post_token)
-            #time.sleep(1)
-            # result = push_urls()
-            # print("\033[0;31m%s\033[0m" % result)
 
 
 # # 推送url到百度
@@ -63,7 +60,7 @@ def post_all_url(token):
     while True:
         path = 'url/cache/' + post_url_path[4:]
         urls = open(path, 'r')
-        url = urls.readline().split('/', 2)[0]
+        url = urls.readline().split('/')[2]
         print(url)
         post = 'curl -H "Content-Type:text/plain" --data-binary @' + path + ' "http://data.zz.baidu.com/urls?site=' + url + '&token=' + token + '"'
         output = subprocess.Popen(post, shell=True, stdout=subprocess.PIPE)
