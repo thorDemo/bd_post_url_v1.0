@@ -2,14 +2,14 @@
 # @Author Nicholas
 # @Function 提交URL 可以选择 提交url时间 提交url的数量 提交url的格式 不一样的Token 提交失败的要输出日志
 # @Function 检测网站是否添加到百度里面
-import random
 import subprocess
 import logging
 import datetime
 import time
 import os
 import requests
-from random import sample
+from random import sample, randint
+from datetime import datetime, timedelta
 # 参数定义
 # ————————————
 post_url_path = 'url/result.txt'                 # 推送哪些url
@@ -33,6 +33,12 @@ logger.addFilter(ch)
 # ————————————
 
 
+def random_time():
+    today = datetime.today()
+    yesterday = today + timedelta(days=randint(-7, 0))
+    return yesterday.strftime("%Y%m%d")
+
+
 # 生成额定数量需要推送的url
 def rand_char():
     char = 'qwertyuiopasdfghjklzxcvbnm1234567890'
@@ -48,8 +54,8 @@ def create_post_url(num):
             print('当前列表页为' + line)
             for x in range(0, num):
                 value = rand_char()
-                now_time = datetime.datetime.now().strftime('%Y%m%d')  # 现在
-                post_url.write('http://www.' + url.strip('\n') + '/' + line.strip('\n') + now_time + value + '.html\n')
+                # now_time = datetime.datetime.now().strftime('%Y%m%d')  # 现在
+                post_url.write('http://www.' + url.strip('\n') + '/' + line.strip('\n') + random_time() + value + '.html\n')
             post_url.close()
             post_all_url(post_token)
 
